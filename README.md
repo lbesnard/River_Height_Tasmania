@@ -7,6 +7,7 @@ A tool to send notification on twitter when a river is paddleable
 G'Day
 I was a bit bored yesterday, and frustrated I didn't check the BOM website and missed out on a North Esk trip last Sunday. So I coded a python script to send a notification on my phone each time a river is at the minimum/perfect paddling level.
 Pretty simple, and definitely geeky but it's useful to me so I'm sure it would be useful to someone, especially with winter time coming.
+
 --------------------------
 |HOW IT WORKS| ---->
 --------------------------
