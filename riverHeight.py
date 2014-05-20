@@ -135,7 +135,7 @@ if __name__ == "__main__":
                 elif matching[0][2] == 'False': 
                     riverRunnable_before = False
 
-            [timeStr,height,currentRiverStatus] = quote_grab(station_name,location)
+            [timeStr,height,currentRiverStatus] = station_info(station_name,location)
             
             #write current river status for next run            
            
@@ -158,7 +158,7 @@ if __name__ == "__main__":
                 msg = message(station_name,timeStr,height,currentRiverStatus)
                 logger.info('TWEET:'+str(msg[0]))
                 
-                #send_tweet(msg)
+                send_tweet(msg)
                 
             elif not chg:
                 logger.info( 'NO CHANGE:' + station_name )
