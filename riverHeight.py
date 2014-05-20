@@ -9,7 +9,7 @@
 # The script is distributed under the terms of the GNU General Public License 
 
 
-import string, re, os, time, smtplib, sys, urllib2, csv, os.path
+import string, re, os, time, smtplib, sys, urllib2, csv, os.path, logging
  
  
 def station_info(station_name,location):
@@ -31,7 +31,6 @@ def station_info(station_name,location):
     endIndex = html.find(end_tag, startIndex) + len(end_tag) - 1
     raw_data = html[startIndex:endIndex]
     
-    print 'Checking height for ' + station_name
 
     #regular expression of the BOM webpage
     mobj = re.search('<.*>(.*)</.*>\n  <.*>(.*)</.*>\n  <.*>(.*)</.*>\n  ', raw_data)
@@ -70,20 +69,40 @@ def send_tweet(msg):
     success = subprocess.call(command, shell=True)
     
     if success == 1:
-        print ('duplicate tweet')
+        logger.info('WARNING : duplicate tweet')
+    elif success == 0:
+        logger.info('Tweet sent')
 
 
   
 if __name__ == "__main__":
     try:  
-    
+        logging.basicConfig(level=logging.INFO)
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.INFO)
+
+        # create a file handler
+        
+        handler = logging.FileHandler('riverHeight.log')
+        handler.setLevel(logging.INFO)
+        
+        # create a logging format
+        
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        
+        # add the handlers to the logger
+        
+        logger.addHandler(handler)
+
         pathname = os.path.dirname(sys.argv[0])        
         pythonScriptPath=os.path.abspath(pathname)
         # paddleable river heigts are written in a file on dropbox
+        logger.info('Open river height file on dropbox')
         csvFile = urllib2.urlopen('https://www.dropbox.com/s/wdbh6m804p4lkwx/riverHeight.csv?dl=1')
     
-        chg = False
- 
+
+        
         # read river status from previous run
         riverStatusFile = pythonScriptPath + '/riverStatus.csv'
         if os.path.isfile(riverStatusFile):
@@ -92,36 +111,59 @@ if __name__ == "__main__":
         else :
             data  = []
             
-        # write current river status for next run in riverStatus.csv
+        #write current river status for next run
         writerRiverStatus = open(pythonScriptPath + '/riverStatus.csv', 'w+')
 
         for line in csvFile:
+            #initialise values for each river
+            chg = False
+            riverRunnable_now = False
+            
             linelst = line.split(',')
             station_name = linelst[0]
             location = linelst[1]
             
-            # find previous river status
+            #find previous river status
             matching = [s for s in data if station_name in s]
             if not matching:
-                previousRiverStatus = 'steady'  
+                previousRiverStatus = 'steady'
+                riverRunnable_before = False
             elif matching:
-                previousRiverStatus = matching[0][1]           
+                previousRiverStatus = matching[0][1]
+                if matching[0][2] == 'True':
+                    riverRunnable_before = True
+                elif matching[0][2] == 'False': 
+                    riverRunnable_before = False
 
-            [timeStr,height,currentRiverStatus] = station_info(station_name,location)
+            [timeStr,height,currentRiverStatus] = quote_grab(station_name,location)
             
-            # write current river status for next run            
-            writerRiverStatus.write(station_name +','+ currentRiverStatus +'\n')
-            
-            if height>=float(linelst[2]) and (str(currentRiverStatus)=='rising') and (previousRiverStatus == 'falling' or previousRiverStatus == 'steady'):
+            #write current river status for next run            
+           
+            if height>=float(linelst[2]):
+                riverRunnable_now = True
+                
+            if riverRunnable_now == True and riverRunnable_before == False:
                 chg = True
+                writerRiverStatus.write(station_name +','+ currentRiverStatus  +',True\n')
+            elif riverRunnable_now == True and riverRunnable_before == True:
+                writerRiverStatus.write(station_name +','+ currentRiverStatus  +',True\n')
+            else :
+                chg = False
+                writerRiverStatus.write(station_name +','+ currentRiverStatus  + ',False\n')
+                
+                
                 
             if chg:
                 #send_email(msg)
-                print 'sending tweet...'
                 msg = message(station_name,timeStr,height,currentRiverStatus)
-                send_tweet(msg)
-            
+                logger.info('TWEET:'+str(msg[0]))
+                
+                #send_tweet(msg)
+                
+            elif not chg:
+                logger.info( 'NO CHANGE:' + station_name )
+                 
         writerRiverStatus.close()
 
     except Exception, e:
-        print ("ERROR: " + str(e))
+        logger.error ("ERROR: " + str(e))
