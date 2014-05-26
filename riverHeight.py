@@ -68,10 +68,7 @@ def send_tweet(msg):
     command = 'twitter -e besnard.laurent@gmail.com set %s' % msg
     success = subprocess.call(command, shell=True)
     
-    if success == 1:
-        logger.info('WARNING : duplicate tweet')
-    elif success == 0:
-        logger.info('Tweet sent')
+    return success
 
 
   
@@ -158,8 +155,12 @@ if __name__ == "__main__":
                 msg = message(station_name,timeStr,height,currentRiverStatus)
                 logger.info('TWEET:'+str(msg[0]))
                 
-                send_tweet(msg)
-                
+                successTweet = send_tweet(msg)
+                if success == 1:
+                    logger.info('WARNING : duplicate tweet')
+                elif success == 0:
+                    logger.info('Tweet sent')                
+            
             elif not chg:
                 logger.info( 'NO CHANGE:' + station_name )
                  
