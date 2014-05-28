@@ -156,9 +156,9 @@ if __name__ == "__main__":
                 logger.info('TWEET:'+str(msg[0]))
                 
                 successTweet = send_tweet(msg)
-                if success == 1:
+                if successTweet == 1:
                     logger.info('WARNING : duplicate tweet')
-                elif success == 0:
+                elif successTweet == 0:
                     logger.info('Tweet sent')                
             
             elif not chg:
