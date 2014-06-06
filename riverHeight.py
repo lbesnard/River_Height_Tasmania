@@ -4,7 +4,7 @@
 # Author: Laurent Besnard
 # email address: laurent.besnard@utas.edu.au
 # Website: https://github.com/lbesnard/River_Height_Tasmania
-# May 2013; Last revision: 15-May-2014
+# May 2013; Last revision: 6-Jun-2014
 #
 # The script is distributed under the terms of the GNU General Public License 
 
