@@ -39,6 +39,7 @@ def dpipwe_data_stations_download(station_name,station_id):
     if os.path.exists(csvDir):
         shutil.rmtree(csvDir)
 
+
     # To prevent download dialog
     profile = webdriver.FirefoxProfile()
     profile.set_preference('browser.download.folderList', 2) # custom location
@@ -46,64 +47,66 @@ def dpipwe_data_stations_download(station_name,station_id):
     profile.set_preference('browser.download.dir', csvDir)
     profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'text/csv')
     
-
+    # Virtual Display of firefox
+    # need to install $ sudo apt-get install xvfb python-pip ; sudo pip install pyvirtualdisplay
+    # http://coreygoldberg.blogspot.com.au/2011/06/python-headless-selenium-webdriver.html
+    from pyvirtualdisplay import Display       
+    display = Display(visible=0, size=(800, 600))
+    display.start()
     
     # open firefox
     driver = webdriver.Firefox(firefox_profile=profile)
-    driver.implicitly_wait(16) # seconds
     
-    # home page
-    driver.get("http://wrt.tas.gov.au/wist/ui") # seconds
-    #driver.implicitly_wait(3) # seconds
+    try:
+        driver.implicitly_wait(16) # seconds. Threshold to wait for
+          
     
-    # open water flow page - sequence number is important and incremented
-    pageSequenceNo = 2
-    driver.get('http://wrt.tas.gov.au/wist/ui?command=content&pageSequenceNo='+ str(pageSequenceNo) +'&click=[0].Name#fopt')
-    #driver.implicitly_wait(3) # seconds
-    
-    # open Search for water flow data 
-    pageSequenceNo = 3
-    driver.get('http://wrt.tas.gov.au/wist/ui?command=content&pageSequenceNo='+ str(pageSequenceNo) +'&click=[1].Name#fopt')
-    
-    # click on button continue and wait
-    element = driver.find_element_by_id("ID0").click()
-    #driver.implicitly_wait(12) # seconds
-    
-    
-    ## this is arbitrary since we need to enter at least one station_name in the page in order to download anything else from any other stations
-    #station_name = 'NORTH WEST BAY RIVULET AT MARGATE WATER SUPPLY INTAKE'
-    
-    # find in page where the station_name can be entered
-    element = driver.find_element_by_id("ID2")
-    #driver.implicitly_wait(3) # seconds
-    
-    element.send_keys(station_name)
-    #driver.implicitly_wait(3) # seconds
-    
-    # click on continue
-    driver.find_element_by_id("ID3").click()
-    #driver.implicitly_wait(4) # seconds
-    
-    sleep(3) # to force python to wait for 2 secondes before downloading any data
-    # click on raw data as csv
-    data = driver.find_element_by_id("ID4").click()
-    #driver.find_element_by_id("ID4").click().implicitly_wait(4) # seconds
-    
-    
-    now = datetime.datetime.now()
-    start_date = now.strftime("%d-%m-%Y")
-    end_date = start_date
-    pageSequenceNo = 7
-    #for station_number in station_list_id:
-         # from here the sequence number is  7 , and any data can be downloaded from any station
+        # home page
+        driver.get("http://wrt.tas.gov.au/wist/ui") # seconds
+        #driver.implicitly_wait(3) # seconds
         
-    url_query = 'http://wrt.tas.gov.au/wist/ui/StationNo.' + str(station_id) + '-StreamFlow-' + start_date +'-to-' + end_date + '.csv?command=download&pageSequenceNo='+ str(pageSequenceNo) +'&fieldName=[1].DownloadsTable[0].FileData'
-    #print url_query        
-    data = driver.get(url_query)
-    #sleep(4)
-    #pageSequenceNo += 1
+        # open water flow page - sequence number is important and incremented
+        pageSequenceNo = 2
+        driver.get('http://wrt.tas.gov.au/wist/ui?command=content&pageSequenceNo='+ str(pageSequenceNo) +'&click=[0].Name#fopt')
         
+        # open Search for water flow data 
+        pageSequenceNo = 3
+        driver.get('http://wrt.tas.gov.au/wist/ui?command=content&pageSequenceNo='+ str(pageSequenceNo) +'&click=[1].Name#fopt')
+        
+        # click on button continue and wait
+        element = driver.find_element_by_id("ID0").click()
+        
+        
+        ## this is arbitrary since we need to enter at least one station_name in the page in order to download anything else from any other stations
+        #station_name = 'NORTH WEST BAY RIVULET AT MARGATE WATER SUPPLY INTAKE' 5201
+        
+        # find in page where the station_name can be entered
+        element = driver.find_element_by_id("ID2")
+        
+        element.send_keys(station_name)
+        
+        # click on continue
+        driver.find_element_by_id("ID3").click()
+        
+        sleep(3) # to force python to wait for 2 secondes before downloading any data
+        # click on raw data as csv
+        data = driver.find_element_by_id("ID4").click()
+        
+        
+        now = datetime.datetime.now()
+        start_date = now.strftime("%d-%m-%Y")
+        end_date = start_date
+        pageSequenceNo = 7
+            
+        url_query = 'http://wrt.tas.gov.au/wist/ui/StationNo.' + str(station_id) + '-StreamFlow-' + start_date +'-to-' + end_date + '.csv?command=download&pageSequenceNo='+ str(pageSequenceNo) +'&fieldName=[1].DownloadsTable[0].FileData'
+        data = driver.get(url_query)
+
+    except Exception, e:
+        1
+       
     driver.close()
+    driver.quit()
+    display.stop()
 
 
 
