@@ -54,56 +54,63 @@ def check_river_height_bom():
 
         for line in csvFile:
             #initialise values for each river
+            
             chgRiverStatus = False
             riverRunnable_now = False
+            linelst = line.split(',') 
+            isLineComment=line.strip().startswith("#")
+            if not isLineComment:
+                station_name = linelst[0]
+                location = linelst[1]
+                station_minFlow = float(linelst[2])
+                riverName = linelst[3]
+                stationNickname = linelst[4]
+                paddleTasmaniaLink = linelst[5]
+                print station_name
             
-            linelst = line.split(',')
-            station_name = linelst[0]
-            location = linelst[1]
-            
-            #find previous river status
-            matching = [s for s in riverStatusdata if station_name in s]
-            if not matching:
-                previousRiverStatus = 'steady'
-                riverRunnable_before = False
-            elif matching:
-                previousRiverStatus = matching[0][1]
-                if matching[0][2] == 'True':
-                    riverRunnable_before = True
-                elif matching[0][2] == 'False': 
+                #find previous river status
+                matching = [s for s in riverStatusdata if station_name in s]
+                if not matching:
+                    previousRiverStatus = 'steady'
                     riverRunnable_before = False
-
-            [timeStr,height,currentRiverStatus] = station_info_bom(station_name,location)
-            
-            #write current river status for next run            
-           
-            if height>=float(linelst[2]):
-                riverRunnable_now = True
+                elif matching:
+                    previousRiverStatus = matching[0][1]
+                    if matching[0][2] == 'True':
+                        riverRunnable_before = True
+                    elif matching[0][2] == 'False': 
+                        riverRunnable_before = False
+    
+                [timeStr,height,currentRiverStatus] = station_info_bom(station_name,location)
                 
-            if riverRunnable_now == True and riverRunnable_before == False:
-                chgRiverStatus = True
-                writerRiverStatus.write(station_name +','+ currentRiverStatus  +',True\n')
-            elif riverRunnable_now == True and riverRunnable_before == True:
-                writerRiverStatus.write(station_name +','+ currentRiverStatus  +',True\n')
-            else :
-                chgRiverStatus = False
-                writerRiverStatus.write(station_name +','+ currentRiverStatus  + ',False\n')
+                #write current river status for next run            
+               
+                if height>=station_minFlow:
+                    riverRunnable_now = True
+                    
+                if riverRunnable_now == True and riverRunnable_before == False:
+                    chgRiverStatus = True
+                    writerRiverStatus.write(station_name +','+ currentRiverStatus  +',True\n')
+                elif riverRunnable_now == True and riverRunnable_before == True:
+                    writerRiverStatus.write(station_name +','+ currentRiverStatus  +',True\n')
+                else :
+                    chgRiverStatus = False
+                    writerRiverStatus.write(station_name +','+ currentRiverStatus  + ',False\n')
+                    
+                    
+                    
+                if chgRiverStatus:
+                    #send_email(msg)
+                    msg = message_BOM(station_name,timeStr,height,currentRiverStatus,riverName,stationNickname,paddleTasmaniaLink)
+                    logger.info('TWEET:'+str(msg[0]))
+                    
+                    successTweet = send_tweet(msg)
+                    if successTweet == 1:
+                        logger.info('WARNING : duplicate tweet')
+                    elif successTweet == 0:
+                        logger.info('Tweet sent')                
                 
-                
-                
-            if chgRiverStatus:
-                #send_email(msg)
-                msg = message_BOM(station_name,timeStr,height,currentRiverStatus)
-                logger.info('TWEET:'+str(msg[0]))
-                
-                successTweet = send_tweet(msg)
-                if successTweet == 1:
-                    logger.info('WARNING : duplicate tweet')
-                elif successTweet == 0:
-                    logger.info('Tweet sent')                
-            
-            elif not chgRiverStatus:
-                logger.info( 'NO CHANGE:' + station_name )
+                elif not chgRiverStatus:
+                    logger.info( 'NO CHANGE:' + station_name )
                  
         writerRiverStatus.close()
 
@@ -160,53 +167,60 @@ def check_river_height_dpipwe():
             riverRunnable_now = False
             
             linelst = line.split(',')
-            station_name = linelst[0]
-            station_id = int(linelst[1])
-            station_minFlow = float(linelst[2])
-            
-            dpipwe_data_stations_download(station_name,station_id)
-            [station_name,lastdate,stationCurrentFlow,currentRiverStatus] = read_csvData(station_id)
-            
-             #find previous river status
-            matching = [s for s in riverStatusdata if station_name in s]
-            if not matching:
-                previousRiverStatus = 'steady'
-                riverRunnable_before = False
-            elif matching:
-                previousRiverStatus = matching[0][1]
-                if matching[0][2] == 'True':
-                    riverRunnable_before = True
-                elif matching[0][2] == 'False': 
-                    riverRunnable_before = False            
-            
-            #write current river status for next run            
-            if stationCurrentFlow>=station_minFlow:
-                riverRunnable_now = True
+            isLineComment=line.strip().startswith("#")
+            if not isLineComment:
+                station_name = linelst[0]
+                station_id = int(linelst[1])
+                station_minFlow = float(linelst[2])
+                riverName = linelst[3]
+                stationNickname = linelst[4]
+                paddleTasmaniaLink = linelst[5]
+                print station_name
+
+               
+                dpipwe_data_stations_download(station_name,station_id)
+                [station_name,lastdate,stationCurrentFlow,currentRiverStatus] = read_csvData(station_id)
                 
-            if riverRunnable_now == True and riverRunnable_before == False:
-                chgRiverStatus = True
-                writerRiverStatus.write(station_name +','+ currentRiverStatus  +',True\n')
-            elif riverRunnable_now == True and riverRunnable_before == True:
-                writerRiverStatus.write(station_name +','+ currentRiverStatus  +',True\n')
-            else :
-                chgRiverStatus = False
-                writerRiverStatus.write(station_name +','+ currentRiverStatus  + ',False\n')
+                 #find previous river status
+                matching = [s for s in riverStatusdata if station_name in s]
+                if not matching:
+                    previousRiverStatus = 'steady'
+                    riverRunnable_before = False
+                elif matching:
+                    previousRiverStatus = matching[0][1]
+                    if matching[0][2] == 'True':
+                        riverRunnable_before = True
+                    elif matching[0][2] == 'False': 
+                        riverRunnable_before = False            
                 
-                
-                
-            if chgRiverStatus:
-                #send_email(msg)
-                msg = message_dpipwe(station_name,lastdate,stationCurrentFlow,currentRiverStatus)
-                logger.info('TWEET:'+str(msg[0]))
-                
-                successTweet = send_tweet(msg)
-                if successTweet == 1:
-                    logger.info('WARNING : duplicate tweet')
-                elif successTweet == 0:
-                    logger.info('Tweet sent')
-                                
-            elif not chgRiverStatus:
-                logger.info( 'NO CHANGE:' + station_name )
+                #write current river status for next run            
+                if stationCurrentFlow>=station_minFlow:
+                    riverRunnable_now = True
+                    
+                if riverRunnable_now == True and riverRunnable_before == False:
+                    chgRiverStatus = True
+                    writerRiverStatus.write(station_name +','+ currentRiverStatus  +',True\n')
+                elif riverRunnable_now == True and riverRunnable_before == True:
+                    writerRiverStatus.write(station_name +','+ currentRiverStatus  +',True\n')
+                else :
+                    chgRiverStatus = False
+                    writerRiverStatus.write(station_name +','+ currentRiverStatus  + ',False\n')
+                    
+                    
+                    
+                if chgRiverStatus:
+                    #send_email(msg)
+                    msg = message_dpipwe(station_name,lastdate,stationCurrentFlow,currentRiverStatus,riverName,stationNickname,paddleTasmaniaLink)
+                    logger.info('TWEET:'+str(msg[0]))
+                    
+                    successTweet = send_tweet(msg)
+                    if successTweet == 1:
+                        logger.info('WARNING : duplicate tweet')
+                    elif successTweet == 0:
+                        logger.info('Tweet sent')
+                                    
+                elif not chgRiverStatus:
+                    logger.info( 'NO CHANGE:' + station_name )
                  
         writerRiverStatus.close()
 

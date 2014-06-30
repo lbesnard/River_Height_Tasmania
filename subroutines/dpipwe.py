@@ -38,7 +38,7 @@ def dpipwe_data_stations_download(station_name,station_id):
     data_folder()
     if os.path.exists(csvDir):
         shutil.rmtree(csvDir)
-
+        os.mkdir(csvDir)
 
     # To prevent download dialog
     profile = webdriver.FirefoxProfile()
@@ -148,9 +148,13 @@ def read_csvData(station_id):
     return station_name,lastdate,cumecs2,currentRiverStatus
 
 
-def message_dpipwe(station_name,lastdate,currentflow,currentRiverStatus):
+def message_dpipwe(station_name,lastdate,currentflow,currentRiverStatus,riverName,stationNickname,paddleTasmaniaLink):
     # create the string message which will be sent by email or twitter
-    msg = [ str(currentflow) + 'cumecs@' + station_name + ':'+ lastdate.strftime("%Y-%m-%d %H:%M:%S")  +'__RiverStatus:' + str(currentRiverStatus)]
+    #msg = [ str(currentflow) + 'cumecs@' + station_name + ':'+ lastdate.strftime("%Y-%m-%d %H:%M:%S")  +'__RiverStatus:' + str(currentRiverStatus)]
+    msg =  riverName+' is ' + str(currentRiverStatus)  + ' at ' +stationNickname +':'  + str(currentflow) + 'cumecs at '+ lastdate.strftime("%Y-%m-%d %H:%M:%S") + '.See ' + paddleTasmaniaLink  
+    if len(msg) > 140:
+        logger.info('WARNING : Tweet size greater than 140')
+
     return msg
     
     
