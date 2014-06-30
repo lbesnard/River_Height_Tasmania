@@ -151,7 +151,7 @@ def read_csvData(station_id):
 def message_dpipwe(station_name,lastdate,currentflow,currentRiverStatus,riverName,stationNickname,paddleTasmaniaLink):
     # create the string message which will be sent by email or twitter
     #msg = [ str(currentflow) + 'cumecs@' + station_name + ':'+ lastdate.strftime("%Y-%m-%d %H:%M:%S")  +'__RiverStatus:' + str(currentRiverStatus)]
-    msg =  riverName+' is ' + str(currentRiverStatus)  + ' at ' +stationNickname +':'  + str(currentflow) + 'cumecs at '+ lastdate.strftime("%Y-%m-%d %H:%M:%S") + '.See ' + paddleTasmaniaLink  
+    msg =  riverName+' is ' + str(currentRiverStatus)  + ' at ' +stationNickname +':'  + str(currentflow) + 'cumecs at '+ lastdate.strftime("%Y-%m-%d %H:%M:%S") + '.See Guide ' + paddleTasmaniaLink  
     if len(msg) > 140:
         logger.info('WARNING : Tweet size greater than 140')
 

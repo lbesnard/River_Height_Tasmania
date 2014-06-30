@@ -38,7 +38,7 @@ def message_BOM(station_name,timeStr,height,status,riverName,stationNickname,pad
     import string, os, time, sys, datetime
 
     # create the string message which will be sent by email or twitter
-    msg =  riverName+' is ' + str(status)  + ' at ' +stationNickname +':'  +  str(height) + 'm at '+ str(timeStr) + '.See ' + paddleTasmaniaLink  
+    msg =  riverName+' is ' + str(status)  + ' at ' +stationNickname +':'  +  str(height) + 'm at '+ str(timeStr) + '.See Guide ' + paddleTasmaniaLink  
     if len(msg) > 140:
         logger.info('WARNING : Tweet size greater than 140')
         
