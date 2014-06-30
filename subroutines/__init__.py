@@ -6,4 +6,4 @@ Created on Fri Jun  6 17:18:58 2014
 """
 
 
-__all__ = ["bom", "dpipwe", "send_notification"]
+__all__ = ["bom", "dpipwe", "send_notification","hydro_charts"]

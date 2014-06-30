@@ -24,8 +24,8 @@
 
 
 def data_folder():
-    global  csvDir 
-    csvDir = '/tmp/riverData'
+    global  river_dataDir 
+    river_dataDir = '/tmp/riverData'
 
 
 def dpipwe_data_stations_download(station_name,station_id):
@@ -36,15 +36,15 @@ def dpipwe_data_stations_download(station_name,station_id):
     import string, os, time,datetime,os.path
     
     data_folder()
-    if os.path.exists(csvDir):
-        shutil.rmtree(csvDir)
-
+    if os.path.exists(river_dataDir):
+        shutil.rmtree(river_dataDir)
+        os.mkdir(river_dataDir)
 
     # To prevent download dialog
     profile = webdriver.FirefoxProfile()
     profile.set_preference('browser.download.folderList', 2) # custom location
     profile.set_preference('browser.download.manager.showWhenStarting', False)
-    profile.set_preference('browser.download.dir', csvDir)
+    profile.set_preference('browser.download.dir', river_dataDir)
     profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'text/csv')
     
     # Virtual Display of firefox
@@ -113,7 +113,7 @@ def dpipwe_data_stations_download(station_name,station_id):
 def read_csvData(station_id):
     import glob
     data_folder()
-    csvfile = glob.glob(csvDir+'/StationNo.' + str(station_id) +'-*.csv')    
+    csvfile = glob.glob(river_dataDir+'/StationNo.' + str(station_id) +'-*.csv')    
 
     # read first and last 2 lines
     with open(csvfile[0], 'rb') as fh:
@@ -148,9 +148,13 @@ def read_csvData(station_id):
     return station_name,lastdate,cumecs2,currentRiverStatus
 
 
-def message_dpipwe(station_name,lastdate,currentflow,currentRiverStatus):
+def message_dpipwe(station_name,lastdate,currentflow,currentRiverStatus,riverName,stationNickname,paddleTasmaniaLink):
     # create the string message which will be sent by email or twitter
-    msg = [ str(currentflow) + 'cumecs@' + station_name + ':'+ lastdate.strftime("%Y-%m-%d %H:%M:%S")  +'__RiverStatus:' + str(currentRiverStatus)]
+    #msg = [ str(currentflow) + 'cumecs@' + station_name + ':'+ lastdate.strftime("%Y-%m-%d %H:%M:%S")  +'__RiverStatus:' + str(currentRiverStatus)]
+    msg =  riverName+' is ' + str(currentRiverStatus)  + ' at ' +stationNickname +':'  + str(currentflow) + 'cumecs at '+ lastdate.strftime("%Y-%m-%d %H:%M:%S") + '.See Guide ' + paddleTasmaniaLink  
+    if len(msg) > 140:
+        logger.info('WARNING : Tweet size greater than 140')
+
     return msg
     
     
@@ -179,7 +183,7 @@ def tail( f, window=20 ):
         block -= 1
     return '\n'.join(''.join(data).splitlines()[-window:])    
     #import glob
-    #files = glob.glob(csvDir+'/*csv.part')    
+    #files = glob.glob(river_dataDir+'/*csv.part')    
     #files.sort(key=lambda x: os.path.getmtime(x))
     #newest_file = files[-1]
     

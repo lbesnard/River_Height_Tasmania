@@ -27,9 +27,19 @@ def station_info_bom(station_name,location):
     
     return timeStr,height,status
 
-def message_BOM(station_name,timeStr,height,status):
+#def message_BOM(station_name,timeStr,height,status):
+#    import string, os, time, sys, datetime
+#
+#    # create the string message which will be sent by email or twitter
+#    msg = [ str(height) + 'm@' + station_name + ':'+ str(timeStr) +'__RiverStatus:' + str(status)]
+#    return msg
+    
+def message_BOM(station_name,timeStr,height,status,riverName,stationNickname,paddleTasmaniaLink):
     import string, os, time, sys, datetime
 
     # create the string message which will be sent by email or twitter
-    msg = [ str(height) + 'm@' + station_name + ':'+ str(timeStr) +'__RiverStatus:' + str(status)]
+    msg =  riverName+' is ' + str(status)  + ' at ' +stationNickname +':'  +  str(height) + 'm at '+ str(timeStr) + '.See Guide ' + paddleTasmaniaLink  
+    if len(msg) > 140:
+        logger.info('WARNING : Tweet size greater than 140')
+        
     return msg
