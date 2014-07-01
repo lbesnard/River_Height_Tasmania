@@ -68,6 +68,8 @@ def check_river_height_bom():
                 stationNickname = linelst[4]
                 paddleTasmaniaLink = linelst[5]
                 paddleTasmaniaLink_short = linelst[6] #done with goo.gl
+                BOM_chartlink = linelst[7] 
+                BOM_chartlink_short = linelst[8] #done with goo.gl
 
                 print station_name
             
@@ -103,7 +105,7 @@ def check_river_height_bom():
                     
                 if chgRiverStatus:
                     #send_email(msg)
-                    msg = message_BOM(station_name,timeStr,height,currentRiverStatus,riverName,stationNickname,paddleTasmaniaLink_short)
+                    msg = message_BOM(station_name,timeStr,height,currentRiverStatus,riverName,stationNickname,paddleTasmaniaLink_short,BOM_chartlink_short)
                     logger.info('TWEET:'+str(msg))
                     
                     successTweet = send_tweet(msg)
