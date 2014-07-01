@@ -294,15 +294,17 @@ def check_river_height_hydroChart():
                 riverName = linelst[0]                
                 station_name = linelst[1]
                 station_minValue = linelst[2]
-                hydroChartLink = linelst[3]
-                boundingBox  = [int(linelst[4]),int(linelst[5]),int(linelst[6]),int(linelst[7])]
-                colorTimeseries   = linelst[8]
-                paddleTasmaniaLink = linelst[9]
-                hydroChartLink_short = linelst[10] #done with goo.gl
-                paddleTasmaniaLink_short = linelst[11] #done with goo.gl
+                station_minValue_number = float(linelst[3])
+                chartType = (linelst[4])
+                hydroChartLink = linelst[5]
+                boundingBox  = [int(linelst[6]),int(linelst[7]),int(linelst[8]),int(linelst[9])]
+                colorTimeseries   = linelst[10]
+                paddleTasmaniaLink = linelst[11]
+                hydroChartLink_short = linelst[12] #done with goo.gl
+                paddleTasmaniaLink_short = linelst[13] #done with goo.gl
 
                 
-                print station_name
+                print riverName
             
                 #find previous river status
                 matching = [s for s in riverStatusdata if station_name in s]
@@ -319,12 +321,22 @@ def check_river_height_hydroChart():
                 #[timeStr,height,currentRiverStatus] = station_info_bom(station_name,location)
                 pdfFile = download_hydroChart(hydroChartLink)
                 [convertSuccess, jpgFile] = convert_chart_pdf_to_jpg(pdfFile)
+                
+                txt_chartFile = convert_chart_pdf_to_txt(pdfFile)
+                
+                # more comments are needed
+                if chartType == 'Height':
+                    allY_coordinates = find_min_max_y_axis_height_dam(txt_chartFile)                   
+                elif chartType == 'Flow':                
+                    allY_coordinates = find_min_max_y_axis_flow(txt_chartFile)
+                    
+                lowYpixelWhereToLookForData = define_y_pixel_range(allY_coordinates,boundingBox[3],boundingBox[2],station_minValue_number)                 
+                boundingBox [3] = lowYpixelWhereToLookForData
                 [riverRunnable_now,currentRiverStatus] = range_color_of_pixel_in_bounding_box(jpgFile,boundingBox,colorTimeseries)
 
                 #write current river status for next run            
                
-
-                    
+                   
                 if riverRunnable_now == True and riverRunnable_before == False:
                     chgRiverStatus = True
                     writerRiverStatus.write(station_name +','+ currentRiverStatus  +',True\n')

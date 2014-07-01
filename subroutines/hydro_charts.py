@@ -75,7 +75,7 @@ def range_color_of_pixel_in_bounding_box(jpgFile,boundingBox,colorTimeseries):
     if nPixels > 5:
         riverStatus = 'very likely on'
         riverOn = True
-    elif (nPixels > 0) & nPixels <5:
+    elif (nPixels > 0) & (nPixels <5):
         riverStatus = 'maybe on'
         riverOn = True
     elif (nPixels == 0):
@@ -95,3 +95,99 @@ def message_hydroChart(riverName,station_name,currentRiverStatus,station_minValu
         logger.info('WARNING : Tweet size greater than 140')
 
     return msg
+    
+    
+def convert_chart_pdf_to_txt(local_chart_file_location):
+    import subprocess
+    txt_chartFile = local_chart_file_location[0:-3]+'txt'
+    command = 'pdf2txt.py -o %s %s' % ( txt_chartFile,local_chart_file_location)
+    success = subprocess.call(command, shell=True)
+    
+    return txt_chartFile
+        
+def find_min_max_y_axis_flow(txt_chartFile):
+    import glob
+    lines = tuple(open(txt_chartFile, 'r'))
+    
+    fin = open(txt_chartFile)
+    flow_line_index = 0
+    for line in fin:
+        if "Flow in ML/day" in line:
+            break
+        flow_line_index += 1 
+    fin.close()
+    
+    top_limit_y_axis_index = flow_line_index+2
+    top_limit_y_axis = int(lines[top_limit_y_axis_index])
+    
+    fin = open(txt_chartFile)
+    zero_line_index = 0
+    for line in fin:       
+        if line == "0\n" :
+            break
+        zero_line_index += 1 
+    fin.close()
+    
+    nY_coordinates = (zero_line_index- top_limit_y_axis_index)/2
+    bottom_limit_y_axis = 0
+    
+    step = top_limit_y_axis / nY_coordinates
+    allY_coordinates = range (bottom_limit_y_axis,top_limit_y_axis+step,step)
+    
+    return allY_coordinates    
+
+def define_y_pixel_range(allY_coordinates,pixel_Y_min,pixel_Y_max,minFlow):
+    #ymin = bottom pixel
+    #ymax = top pixel
+    nPixelPerYCoordinate =  abs(pixel_Y_min - pixel_Y_max)*1.0 /(allY_coordinates[-1]-allY_coordinates[0] )*1.0 
+    
+    lowYpixelWhereToLookForData = int(pixel_Y_min - (minFlow * nPixelPerYCoordinate))
+    
+    return lowYpixelWhereToLookForData    
+    
+    
+# more comments are needed
+def find_min_max_y_axis_height_dam(txt_chartFile):
+    import glob
+    lines = tuple(open(txt_chartFile, 'r'))
+    
+    fin = open(txt_chartFile)
+    flow_line_index = 0
+    for line in fin:
+        if "Metres from full - last 14 days" in line:
+            break
+        flow_line_index += 1 
+    fin.close()
+    
+    top_limit_y_axis_index = flow_line_index+2
+    top_limit_y_axis =float (lines[top_limit_y_axis_index])
+    
+    import datetime
+    month_fortnight_ago = datetime.date.fromordinal(datetime.date.today().toordinal()-14).strftime("%B")
+    
+   
+    fin = open(txt_chartFile)
+    zero_line_index = 0
+    for line in fin:        
+        if line[0:3] == month_fortnight_ago[0:3] :            
+            break
+        zero_line_index += 1 
+    fin.close()
+    
+    nY_coordinates = (zero_line_index  - top_limit_y_axis_index)/2
+    bottom_limit_y_axis = float(lines[zero_line_index-2])
+
+    
+    step = (top_limit_y_axis - bottom_limit_y_axis) / (nY_coordinates-1)
+    allY_coordinates = drange(bottom_limit_y_axis,top_limit_y_axis,step)
+    allY_coordinates=["%f" % x for x in allY_coordinates]
+    allY_coordinates= map(float, allY_coordinates)
+    
+    return allY_coordinates   
+    
+def drange(start, stop, step):
+    r = start
+    while r < stop:
+        yield r
+        r += step
+        
