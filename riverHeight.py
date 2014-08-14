@@ -539,7 +539,7 @@ def createStatus_webpage():
 
     text_file.write("</table>\n")
     
-    text_file.write("<p><b>This webpage is a beta version. It's purposed is simple, to have all the Tasmanian rivers status visible at once. Things can be improved. Don't hesitate to contact me to give me your feedbacks</b></p>\n")
+    text_file.write("<p>This webpage is a beta version. Its purpose is simple, to have all the Tasmanian rivers status visible at once. Things can be improved. Don't hesitate to contact me to give me your feedbacks</p>\n")
     text_file.write("<a href=\"mailto:besnard.laurent@gmail.com\">email</a> \n")
     text_file.write("\n\n\n<p><a href=\"https://www.facebook.com/CreekingTasmaniaRiverFlows\">Facebook page : CreekingTasmaniaRiverFlows</a></p>\n")
     text_file.write("<p><a href=\"https://github.com/lbesnard/River_Height_Tasmania\">Github repository</a></p>\n")
