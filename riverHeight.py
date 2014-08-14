@@ -39,8 +39,6 @@ def check_river_height_bom():
         # paddleable river heigts are written in a file on dropbox
         logger.info('Open river height BOM file on dropbox')
         csvFile = urllib2.urlopen('https://www.dropbox.com/s/g81irf5nhad8y8r/riverHeight_bom.csv?dl=1')
-    
-
         
         # read river status from previous run
         riverStatusFile = pythonScriptPath + '/riverStatus_bom.csv'
@@ -52,7 +50,11 @@ def check_river_height_bom():
             
         #write current river status for next run
         writerRiverStatus = open(riverStatusFile, 'w+')
-
+        
+        # to create a html page later on
+        riverStatusFile_BOM_CSV_for_Webpage = pythonScriptPath + '/riverStatus_BOM_CSV_for_Webpage.csv'
+        writerRiverStatus_BOM_CSV_for_Webpage = open(riverStatusFile_BOM_CSV_for_Webpage, 'w+')
+        
         for line in csvFile:
             #initialise values for each river
             
@@ -69,7 +71,7 @@ def check_river_height_bom():
                 paddleTasmaniaLink = linelst[5]
                 paddleTasmaniaLink_short = linelst[6] #done with goo.gl
                 BOM_chartlink = linelst[7] 
-                BOM_chartlink_short = linelst[8] #done with goo.gl
+                BOM_chartlink_short = linelst[8].rstrip('\n') #done with goo.gl
 
                 print station_name
             
@@ -84,7 +86,7 @@ def check_river_height_bom():
                         riverRunnable_before = True
                     elif matching[0][2] == 'False': 
                         riverRunnable_before = False
-    
+       
                 [timeStr,height,currentRiverStatus] = station_info_bom(station_name,location)
                 
                 #write current river status for next run            
@@ -116,9 +118,13 @@ def check_river_height_bom():
                 
                 elif not chgRiverStatus:
                     logger.info( 'NO CHANGE:' + station_name )
+                    
+                #create current BOM status text file to create later on a html page
+                writerRiverStatus_BOM_CSV_for_Webpage.write(riverName +','+ station_name  +','+ paddleTasmaniaLink_short + ',' + BOM_chartlink_short + ',' + str(station_minFlow) + 'm' +  ',' + str(height) +'m' +','  + timeStr +  ',' + currentRiverStatus +',' + str(riverRunnable_now) + '\n')
+    
                  
         writerRiverStatus.close()
-
+        writerRiverStatus_BOM_CSV_for_Webpage.close()
     except Exception, e:
         logger.error ("ERROR: " + str(e))
 
@@ -166,6 +172,10 @@ def check_river_height_dpipwe():
             
         #write current river status for next run
         writerRiverStatus = open(riverStatusFile_DPIPWE, 'w+')
+        
+        # to create a html page later on
+        riverStatusFile_DPIPWE_CSV_for_Webpage = pythonScriptPath + '/riverStatus_DPIPWE_CSV_for_Webpage.csv'
+        writerRiverStatus_DPIPWE_CSV_for_Webpage = open(riverStatusFile_DPIPWE_CSV_for_Webpage, 'w+')
                 
         for line in csvFile_dpipwe:
             #initialise values for each river
@@ -181,7 +191,7 @@ def check_river_height_dpipwe():
                 riverName = linelst[3]
                 stationNickname = linelst[4]
                 paddleTasmaniaLink = linelst[5]
-                paddleTasmaniaLink_short = linelst[6] #done with goo.gl
+                paddleTasmaniaLink_short = linelst[6].rstrip('\n') #done with goo.gl
 
                 print station_name
 
@@ -229,8 +239,13 @@ def check_river_height_dpipwe():
                                     
                 elif not chgRiverStatus:
                     logger.info( 'NO CHANGE:' + station_name )
+                    
+                 #create current BOM status text file to create later on a html page
+                writerRiverStatus_DPIPWE_CSV_for_Webpage.write(riverName +','+ station_name  +','+ paddleTasmaniaLink_short + ',' + 'No Chart available' + ',' + str(station_minFlow) + 'Cumecs' +  ',' + str(stationCurrentFlow) +'Cumecs' +','  + lastdate.strftime("%Y-%m-%d %H:%M:%S") +  ',' + currentRiverStatus +',' + str(riverRunnable_now) + '\n')
+        
                  
         writerRiverStatus.close()
+        writerRiverStatus_DPIPWE_CSV_for_Webpage.close()
 
     except Exception, e:
         logger.error ("ERROR: " + str(e))
@@ -283,6 +298,10 @@ def check_river_height_hydroChart():
         #write current river status for next run
         writerRiverStatus = open(riverStatusFile, 'w+')
 
+        # to create a html page later on
+        riverStatusFile_HYDRO_CSV_for_Webpage = pythonScriptPath + '/riverStatus_HYDRO_CSV_for_Webpage.csv'
+        writerRiverStatus_HYDRO_CSV_for_Webpage = open(riverStatusFile_HYDRO_CSV_for_Webpage, 'w+')
+
         for line in csvFile:
             #initialise values for each river
             
@@ -301,7 +320,7 @@ def check_river_height_hydroChart():
                 colorTimeseries   = linelst[10]
                 paddleTasmaniaLink = linelst[11]
                 hydroChartLink_short = linelst[12] #done with goo.gl
-                paddleTasmaniaLink_short = linelst[13] #done with goo.gl
+                paddleTasmaniaLink_short = linelst[13].rstrip('\n') #done with goo.gl
 
                 
                 print riverName
@@ -361,9 +380,13 @@ def check_river_height_hydroChart():
                 
                 elif not chgRiverStatus:
                     logger.info( 'NO CHANGE:' + station_name )
+                
+                writerRiverStatus_HYDRO_CSV_for_Webpage.write(riverName +','+ station_name  +','+ paddleTasmaniaLink_short + ',' + hydroChartLink_short    + ',' + station_minValue  +  ',' + 'N.A.' +','  +  datetime.datetime.now().strftime("%Y-%m-%d") +  ',' + currentRiverStatus +',' + str(riverRunnable_now) + '\n')
+
                  
         writerRiverStatus.close()
-
+        writerRiverStatus_HYDRO_CSV_for_Webpage.close()
+        
     except Exception, e:
         logger.error ("ERROR: " + str(e))
 
@@ -374,10 +397,165 @@ def check_river_height_hydroChart():
         i.flush()
         i.close()        
         
+        
+def createStatus_webpage():
+    # needs to be on the Public folder of Dropbox.
+    # the DropboxPath value should be written in a config file
+
+    pathname = os.path.dirname(sys.argv[0])        
+    pythonScriptPath=os.path.abspath(pathname)  
+    DropboxPath = '/home/lbesnard/Dropbox'
+
+    text_file = open(DropboxPath +"/Public/RiverStatusTasmania.html", "w")
+    text_file.write("<!DOCTYPE html>\n")
+    text_file.write("<html>\n")
+    text_file.write("<head>\n")
+    text_file.write("<style>\n")
+    text_file.write("table,th,td\n")
+    text_file.write("{border:1px solid black;border-collapse:collapse;}\n")
+    text_file.write("</style>\n")
+    text_file.write("</head>\n")
+    text_file.write("<body>\n")
+    text_file.write("<p><font size=\"20\"><b>Tasmania River Status in near real time - Beta</b></font></p>\n\n\n")
+    text_file.write("<p>Last page update at "+ datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y") +"</p>\n\n\n")
+    text_file.write("<table>\n")
+    text_file.write("  <tr>\n")
+    text_file.write("    <th>River Name</th>\n")
+    text_file.write("    <th>Station Name</th>\n")
+    text_file.write("    <th>PaddleTas Guide</th>\n")
+    text_file.write("    <th>Chart</th>\n")
+    text_file.write("    <th>Minimum Paddleable height/flow</th>\n")
+    text_file.write("    <th>Current height/flow</th>\n")
+    text_file.write("    <th>Time</th>\n")
+    text_file.write("    <th>Steady/Rising/Droping</th>\n")
+    text_file.write("    <th>Kayakable ?</th>\n")
+    text_file.write("  </tr>\n")
+    
+    #BOM
+    riverStatusFile_BOM_CSV_for_Webpage = pythonScriptPath + '/riverStatus_BOM_CSV_for_Webpage.csv'
+    if os.path.isfile(riverStatusFile_BOM_CSV_for_Webpage):
+        csvFile = open(riverStatusFile_BOM_CSV_for_Webpage)
+        for line in csvFile:        
+            linelst = line.split(',') 
+            isLineComment=line.strip().startswith("#")
+            if not isLineComment:
+                river_name = linelst[0]
+                station_name = linelst[1]
+                paddleTas_guide = linelst[2]
+                chart = linelst[3]
+                minimum_PaddleableValue = linelst[4]
+                currentValue = linelst[5]
+                dataTime = linelst[6]
+                riverStatus = linelst[7]
+                kayakable  = linelst[8].rstrip('\n')
+                
+                text_file.write("  <tr>\n")
+                text_file.write("<th>"+ river_name + "</th>\n")
+                text_file.write("<th>"+ station_name  + "</th>\n")
+                text_file.write("<th><a href=\"http:\\" +paddleTas_guide  +"\">Topo</a></th>\n")
+                text_file.write("<th><a href=\"http:\\" +chart  +"\">Chart</a></th>\n")
+                text_file.write("<th>"+ minimum_PaddleableValue + "</th>\n")
+                text_file.write("<th>"+ currentValue + "</th>\n")
+                text_file.write("<th>"+ dataTime + "</th>\n")
+                text_file.write("<th>"+ riverStatus + "</th>\n")
+                if kayakable == 'True':
+                    text_file.write("<td bgcolor=\"#00ff00\">Yes</td>\n")
+                if kayakable == 'False':
+                    text_file.write("<td bgcolor=\"#ff0000\">No</td>\n")    
+                
+                text_file.write("</tr>\n")
+                
+    #DPIPWE
+    riverStatusFile_DPIPWE_CSV_for_Webpage = pythonScriptPath + '/riverStatus_DPIPWE_CSV_for_Webpage.csv'
+    if os.path.isfile(riverStatusFile_DPIPWE_CSV_for_Webpage):
+        csvFile = open(riverStatusFile_DPIPWE_CSV_for_Webpage)
+        for line in csvFile:        
+            linelst = line.split(',') 
+            isLineComment=line.strip().startswith("#")
+            if not isLineComment:
+                river_name = linelst[0]
+                station_name = linelst[1]
+                paddleTas_guide = linelst[2]
+                chart = linelst[3]
+                minimum_PaddleableValue = linelst[4]
+                currentValue = linelst[5]
+                dataTime = linelst[6]
+                riverStatus = linelst[7]
+                kayakable  = linelst[8].rstrip('\n')
+                
+                text_file.write("  <tr>\n")
+                text_file.write("<th>"+ river_name + "</th>\n")
+                text_file.write("<th>"+ station_name  + "</th>\n")
+                text_file.write("<th><a href=\"http:\\" +paddleTas_guide  +"\">Topo</a></th>\n")
+                text_file.write("<th> No Chart available</th>\n")
+                text_file.write("<th>"+ minimum_PaddleableValue + "</th>\n")
+                text_file.write("<th>"+ currentValue + "</th>\n")
+                text_file.write("<th>"+ dataTime + "</th>\n")
+                text_file.write("<th>"+ riverStatus + "</th>\n")
+                if kayakable == 'True':
+                    text_file.write("<td bgcolor=\"#00ff00\">Yes</td>\n")
+                if kayakable == 'False':
+                    text_file.write("<td bgcolor=\"#ff0000\">No</td>\n")    
+                
+                text_file.write("</tr>\n")                
+              
+
+    #HYDRO
+    riverStatusFile_HYDRO_CSV_for_Webpage = pythonScriptPath + '/riverStatus_HYDRO_CSV_for_Webpage.csv'
+    if os.path.isfile(riverStatusFile_HYDRO_CSV_for_Webpage):
+        csvFile = open(riverStatusFile_HYDRO_CSV_for_Webpage)
+        for line in csvFile:        
+            linelst = line.split(',') 
+            isLineComment=line.strip().startswith("#")
+            if not isLineComment:
+                river_name = linelst[0]
+                station_name = linelst[1]
+                paddleTas_guide = linelst[2]
+                chart = linelst[3]
+                minimum_PaddleableValue = linelst[4]
+                currentValue = linelst[5]
+                dataTime = linelst[6]
+                riverStatus = linelst[7]
+                kayakable  = linelst[8].rstrip('\n')
+                
+                text_file.write("  <tr>\n")
+                text_file.write("<th>"+ river_name + "</th>\n")
+                text_file.write("<th>"+ station_name  + "</th>\n")
+                text_file.write("<th><a href=\"http:\\" +paddleTas_guide  +"\">Topo</a></th>\n")
+                text_file.write("<th><a href=\"http:\\" +chart  +"\">Chart</a></th>\n")
+                text_file.write("<th>"+ minimum_PaddleableValue + "</th>\n")
+                text_file.write("<th>"+ currentValue + "</th>\n")
+                text_file.write("<th>"+ dataTime + "</th>\n")
+                text_file.write("<th>"+ riverStatus + "</th>\n")
+                if kayakable == 'True':
+                    text_file.write("<td bgcolor=\"#00ff00\">Yes</td>\n")
+                if kayakable == 'False':
+                    text_file.write("<td bgcolor=\"#ff0000\">No</td>\n")    
+                
+                text_file.write("</tr>\n")
+                
+          # end code of html file     
+
+
+    text_file.write("</table>\n")
+    
+    text_file.write("<p><b>This webpage is a beta version. It's purposed is simple, to have all the Tasmanian rivers status visible at once. Things can be improved. Don't hesitate to contact me to give me your feedbacks</b></p>\n")
+    text_file.write("<a href=\"mailto:besnard.laurent@gmail.com\">email</a> \n")
+    text_file.write("\n\n\n<p><a href=\"https://www.facebook.com/CreekingTasmaniaRiverFlows\">Facebook page : CreekingTasmaniaRiverFlows</a></p>\n")
+    text_file.write("<p><a href=\"https://github.com/lbesnard/River_Height_Tasmania\">Github repository</a></p>\n")
+    text_file.write("</body>\n")
+    text_file.write("</html>\n")            
+    text_file.close()
+
+        
+            
+            
+            
 if __name__ == "__main__":
     try:
         check_river_height_bom()
         check_river_height_hydroChart()
         check_river_height_dpipwe()
+        createStatus_webpage()
     except Exception, e:
         print 
