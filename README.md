@@ -1,22 +1,22 @@
-River_Height_Tasmania
+River Heights Tasmania : a kayakers dream tool !
 =====================
 
 A tool to check the current height of Tasmanian rivers with an online gauge and to send notifications via twitter/facebook when a river is paddleable.
 
 Data from DPIPWE, Hydro and BOM are checked every half an hour. If a river is above a certain flow/height, and wasn't in the previous run of the script, a notification is sent to a twitter account (which can be then seen automatically on a smartphone), and is then synced to facebook.
-[CreekingTasmaniaRiverFlows_Twitter](https://twitter.com/besnard_laurent)
-[CreekingTasmaniaRiverFlows_Facebook](https://www.facebook.com/CreekingTasmaniaRiverFlows?fref=nf)
+* [CreekingTasmaniaRiverFlows_Twitter](https://twitter.com/besnard_laurent)
+* [CreekingTasmaniaRiverFlows_Facebook](https://www.facebook.com/CreekingTasmaniaRiverFlows?fref=nf)
 
 A summary page is also updated every half hour:
-[RiverStatusTasmania](http://www.elcaminoloco.net/tas_river/RiverStatusTasmania.html)
+* [RiverStatusTasmania](http://www.elcaminoloco.net/tas_river/RiverStatusTasmania.html)
 
 
 
 # INFORMATION 
 Links to the different config files
-https://www.dropbox.com/s/g81irf5nhad8y8r/riverHeight_bom.csv?dl=1
-https://www.dropbox.com/s/hjp7hxsf2eatir5/riverHeight_dpipwe.csv?dl=1
-https://www.dropbox.com/s/wkmc2db7muys8k8/riverHeight_hydroCharts.csv?dl=1
+* https://www.dropbox.com/s/g81irf5nhad8y8r/riverHeight_bom.csv?dl=1
+* https://www.dropbox.com/s/hjp7hxsf2eatir5/riverHeight_dpipwe.csv?dl=1
+* https://www.dropbox.com/s/wkmc2db7muys8k8/riverHeight_hydroCharts.csv?dl=1
 
 
 ## BOM
