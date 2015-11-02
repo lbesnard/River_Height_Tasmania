@@ -29,4 +29,11 @@ The DPIPWE website is more complicated to handle. Although near-realtime csv fil
 ## HYDRO
 Data only exists as different pdf files, with a mix of timeseries images and embedded text. Plots have a changeable scale. Looking for the min and max values to know what the flow (MG/L) per pixel is, is the priority. I'm then looking for the existance or not of blue pixels of the timeseries (for example) within a box. No accurate data is given since the image quality of the timeseries would only give approximate values.
 
+## Installation
 
+Crontab
+```
+PATH=$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+0,30 *  * * * . $HOME/.profile;  export DISPLAY=:0 && python /opt/River_Height_Tasmania/riverHeight.py ; ftp_upload.sh
+
+```
