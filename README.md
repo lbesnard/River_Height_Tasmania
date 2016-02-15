@@ -30,6 +30,10 @@ The DPIPWE website is more complicated to handle. Although near-realtime csv fil
 Data only exists as different pdf files, with a mix of timeseries images and embedded text. Plots have a changeable scale. Looking for the min and max values to know what the flow (MG/L) per pixel is, is the priority. I'm then looking for the existance or not of blue pixels of the timeseries (for example) within a box. No accurate data is given since the image quality of the timeseries would only give approximate values.
 
 ## Installation
+```
+sudo pip install selenium; pip install pyvirtualdisplay; pip install pdfminer;
+git clone git@github.com:lbesnard/River_Height_Tasmania
+```
 
 Crontab
 ```
